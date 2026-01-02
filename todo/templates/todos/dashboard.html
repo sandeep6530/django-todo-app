@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock title %}
+
+{% block content %}
+<ul>
+{% if todos %}
+    {% for todo in todos %}
+        <li>{{ todo.title }}</li>
+        <li>{{ todo.description }}</li>
+        <li>{{ todo.status }}</li>
+    {% endfor %}
+    {% else %}
+    <h2>No Todo yet</h2>
+{% endif %}
+</ul>
+{% endblock content %}
