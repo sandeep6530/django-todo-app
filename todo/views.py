@@ -34,7 +34,7 @@ def dashboard(request):
 @login_required
 def addTodo(request):
     if request.method == "POST":
-        form = TodoForm(request.POST)
+        form = TodoForm(request.POST, initial={ "user": request.user })
         if form.is_valid():
             todo = form.save(commit=False)
             todo.user = request.user
