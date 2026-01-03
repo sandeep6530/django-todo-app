@@ -1,28 +1,34 @@
-{% extends "base.html" %}
-
-{% block title %}Dashboard{% endblock title %}
-
+{% extends "base.html" %} {% block title %}Dashboard{% endblock title %} 
 {% block content %}
+
+ <form action="" method="get">
+    <input type="text" name="search" id="" placeholder="Search todo..." value="{{ request.GET.search }}">
+
+    <select name="status" id="">
+        <option value="">All</option>
+        <option value="pending" {% if request.GET.status == "pending" %}selected{% endif %}>Pending</option>
+        <option value="complete" {% if request.GET.status == "complete" %}selected{% endif %}>Completed</option>
+    </select>
+    <button type="submit">Filter</button>
+ </form>
+
 <ul>
-{% if todos %}
-    {% for todo in todos %}
-        <li>{{ todo.title }}</li>
-        <li>{{ todo.description }}</li>
-        <li>{{ todo.status }}</li>
-    {% endfor %}
-    {% else %}
-    <h2>No Todo yet</h2>
-{% endif %}
+  {% if todos %} {% for todo in todos %}
+  <li>{{ todo.title }}</li>
+  <li>{{ todo.description }}</li>
+  <li>{{ todo.status }}</li>
+  {% endfor %} {% else %}
+  <h2>No Todo yet</h2>
+  {% endif %}
 </ul>
 <div>
-    {% if todos.has_previous %}
-        <a href="?page={{ todos.previous_page_number }}">Previous</a>
-    {% endif %}
-    Page {{ todos.number }} of {{ todos.paginator.num_pages }}
-
-    {% if todos.has_next %}
-        <a href="?page={{ todos.next_page_number }}">Next</a>
-    {% endif %}
+  {% if todos.has_previous %}
+  <a href="?page={{ todos.previous_page_number }}">Previous</a>
+  {% endif %} 
+  Page {{ todos.number }} of {{ todos.paginator.num_pages }} 
+  {% if todos.has_next %}
+  <a href="?page={{ todos.next_page_number }}">Next</a>
+  {% endif %}
 </div>
 
 {% endblock content %}

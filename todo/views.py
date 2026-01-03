@@ -8,8 +8,22 @@ from .models import Todo
 
 @login_required
 def dashboard(request):
-    todo_list = Todo.objects.filter(user=request.user).select_related("user").order_by("-created_at")
-    paginator = Paginator(todo_list, 10)
+    # todo_list = Todo.objects.filter(user=request.user).select_related("user").order_by("-created_at")
+    # paginator = Paginator(todo_list, 10)
+    # page_number = request.GET.get("page")
+    # todos = paginator.get_page(page_number)
+
+    todo_list = Todo.objects.filter(user=request.user)
+    search_query = request.GET.get("search")
+    status_filter = request.GET.get("status")
+    if search_query:
+         todo_list = todo_list.filter(title__icontains=search_query)
+    
+    if status_filter:
+         todo_list = todo_list.filter(status=status_filter)
+
+    todo_list = todo_list.select_related("user").order_by("-created_at")
+    paginator = Paginator(todo_list, 5)
     page_number = request.GET.get("page")
     todos = paginator.get_page(page_number)
 
