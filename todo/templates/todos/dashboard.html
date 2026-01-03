@@ -12,6 +12,8 @@
     <button type="submit">Filter</button>
  </form>
 
+<a href="{% url "addTodo" %}">Add Todo</a>
+
 <ul>
   {% if todos %} {% for todo in todos %}
   <li>{{ todo.title }}</li>
