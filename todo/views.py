@@ -55,7 +55,7 @@ def editTodo(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Todo updated successfully!")
-            return redirect("dashboad")
+            return redirect("dashboard")
     else:
         form = TodoForm(instance=todo)
     return render(request, "todos/editTodo.html", {"form": form})
@@ -68,3 +68,16 @@ def deleteTodo(request, pk):
         todo.delete()
         messages.info(request, f"{todo.title} is deleted.")
         return redirect("dashboard")
+
+
+@login_required
+def toggleStatus(request, pk):
+    todo = get_object_or_404(Todo, id=pk, user=request.user)
+
+    if todo.status == "pending":
+        todo.status = "complete"
+    else:
+        todo.status = "pending"
+
+    todo.save()
+    return redirect("dashboard")

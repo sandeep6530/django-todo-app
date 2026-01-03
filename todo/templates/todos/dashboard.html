@@ -1,6 +1,10 @@
-{% extends "base.html" %} {% block title %}Dashboard{% endblock title %} 
+{% extends "base.html" %}
+
+ {% block title %}Dashboard{% endblock title %} 
+
 {% block content %}
 
+<h2>My Todos</h2>
  <form action="" method="get">
     <input type="text" name="search" id="" placeholder="Search todo..." value="{{ request.GET.search }}">
 
@@ -10,20 +14,50 @@
         <option value="complete" {% if request.GET.status == "complete" %}selected{% endif %}>Completed</option>
     </select>
     <button type="submit">Filter</button>
+    <a href="{% url "dashboard" %}">Reset</a>
  </form>
+<hr>
 
 <a href="{% url "addTodo" %}">Add Todo</a>
 
-<ul>
-  {% if todos %} {% for todo in todos %}
-  <li>{{ todo.title }}</li>
-  <li>{{ todo.description }}</li>
-  <li>{{ todo.status }}</li>
-  {% endfor %} {% else %}
-  <h2>No Todo yet</h2>
-  {% endif %}
-</ul>
-<div>
+  {% if todos %} 
+  <table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Staatus</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for todo in todos %}
+        <tr>
+          <td>{{ todo.title | capfirst }}</td>
+          <td>{{ todo.description|truncatechars:40 }}</td>
+          <td>
+            <form action="{% url "toggleStatus" todo.pk %}" method="post">
+              {% csrf_token %}
+              {% if todo.status ==  "pending" %}
+                <button style="color: orange; font-weight: bold">Pending</button>
+              {% else %}
+                <button style="color: green; font-weight: bold">Complete</button>
+              {% endif %}
+              </form>
+          </td>
+          <td>{{ todo.created_at|date:"d M Y" }}</td>
+          <td>
+            <a href="{% url "editTodo" todo.pk %}">Edit</a>
+            <a href="{% url "deleteTodo" todo.pk %}">Delete</a>
+          </td>
+        </tr>
+        {% endfor %} 
+    </tbody>
+  </table>
+ 
+<!-- Pagination -->
+<div style="margin-top: 15px;">
   {% if todos.has_previous %}
   <a href="?page={{ todos.previous_page_number }}">Previous</a>
   {% endif %} 
@@ -32,5 +66,9 @@
   <a href="?page={{ todos.next_page_number }}">Next</a>
   {% endif %}
 </div>
+
+{% else %}
+<h3>No Todo yet</h3>
+{% endif %}
 
 {% endblock content %}
