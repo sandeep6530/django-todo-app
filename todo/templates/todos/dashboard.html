@@ -14,4 +14,15 @@
     <h2>No Todo yet</h2>
 {% endif %}
 </ul>
+<div>
+    {% if todos.has_previous %}
+        <a href="?page={{ todos.previous_page_number }}">Previous</a>
+    {% endif %}
+    Page {{ todos.number }} of {{ todos.paginator.num_pages }}
+
+    {% if todos.has_next %}
+        <a href="?page={{ todos.next_page_number }}">Next</a>
+    {% endif %}
+</div>
+
 {% endblock content %}
