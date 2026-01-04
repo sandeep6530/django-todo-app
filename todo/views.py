@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 
+from todo.selectors.todo_selectors import get_user_todos
+from todo.services.todo_service import toggle_todo_status
 from .models import Todo
 from .forms import TodoForm
 
@@ -14,16 +16,11 @@ def dashboard(request):
     # page_number = request.GET.get("page")
     # todos = paginator.get_page(page_number)
 
-    todo_list = Todo.objects.filter(user=request.user)
     search_query = request.GET.get("search")
     status_filter = request.GET.get("status")
-    if search_query:
-        todo_list = todo_list.filter(title__icontains=search_query)
+    
+    todo_list = get_user_todos(user=request.user, search=search_query, status=status_filter)
 
-    if status_filter:
-        todo_list = todo_list.filter(status=status_filter)
-
-    todo_list = todo_list.select_related("user").order_by("-created_at")
     paginator = Paginator(todo_list, 5)
     page_number = request.GET.get("page")
     todos = paginator.get_page(page_number)
@@ -74,10 +71,5 @@ def deleteTodo(request, pk):
 def toggleStatus(request, pk):
     todo = get_object_or_404(Todo, id=pk, user=request.user)
 
-    if todo.status == "pending":
-        todo.status = "complete"
-    else:
-        todo.status = "pending"
-
-    todo.save()
+    toggle_todo_status(todo)
     return redirect("dashboard")
