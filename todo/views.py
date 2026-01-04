@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 
 from todo.selectors.todo_selectors import get_user_todos
-from todo.services.todo_service import toggle_todo_status
+from todo.services.todo_service import toggle_todo_status, soft_delete_todo
 from .models import Todo
 from .forms import TodoForm
 
@@ -61,10 +61,9 @@ def editTodo(request, pk):
 @login_required
 def deleteTodo(request, pk):
     todo = get_object_or_404(Todo, id=pk, user=request.user)
-    if request.method == "POST":
-        todo.delete()
-        messages.info(request, f"{todo.title} is deleted.")
-        return redirect("dashboard")
+    soft_delete_todo(todo)
+    messages.info(request, f"{todo.title} is deleted.")
+    return redirect("dashboard")
 
 
 @login_required
