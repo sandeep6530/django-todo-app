@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from user.models import User
 
 class Todo(models.Model):
@@ -27,3 +28,17 @@ class Todo(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+class AuditLog(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True
+    )
+    action = models.CharField(max_length=50)
+    todo_title = models.CharField(max_length=255)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.action} - {self.todo_title}"
