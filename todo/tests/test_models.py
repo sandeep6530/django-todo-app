@@ -31,3 +31,15 @@ class TodoModelTest(TestCase):
         )
 
         self.assertEqual(AuditLog.objects.count(), 1)
+
+    def test_soft_delete_marks_fields(self):
+        todo = Todo.objects.create(
+            user=self.user,
+            title="Test Todo",
+            status="pending"
+        )
+        todo.soft_delete(user=self.user)
+
+        self.assertTrue(todo.is_deleted)
+        self.assertIsNotNone(todo.deleted_at)
+        self.assertEqual(todo.deleted_by, self.user)

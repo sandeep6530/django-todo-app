@@ -69,6 +69,5 @@ class TodoViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(
-            Todo.objects.filter(user=self.user).exists(), True
-        )
+        todo = Todo.all_objects.get(id=self.todo.id)
+        self.assertTrue(todo.is_deleted)

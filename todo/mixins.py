@@ -19,3 +19,14 @@ class OwnerRequiredMixin:
             raise Http404
         
         return obj
+    
+
+class OwnerQuerySetMixin:
+    owner_field = "user"
+
+    def get_queryset(self):
+        assert hasattr(self, "queryset") or hasattr(self, "model"), (
+            "OwnerQuerySetMixin requires queryset and model"
+        )
+        qs = super().get_queryset()
+        return qs.filter(**{self.owner_field: self.request.user})

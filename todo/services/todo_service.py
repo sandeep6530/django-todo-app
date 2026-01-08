@@ -1,4 +1,6 @@
-from todo.models import Todo
+from django.db import transaction
+
+from todo.models import Todo, AuditLog
 from todo.policies import TodoPolicy
 
 def toggle_todo_status(todo):
@@ -23,8 +25,8 @@ def update_todo_status(*, todo, status):
     todo.save(update_fields=["status"])
     return todo
 
-def delete_todo(*, todo):
-    todo.delete()
+def delete_todo(*, todo, user):
+    todo.soft_delete(user=user)
 
 
 def update_todo(todo, user, data):
@@ -36,3 +38,13 @@ def update_todo(todo, user, data):
     
     todo.save()
     return todo
+
+def log_action(user, action, obj):
+    def _log():
+        AuditLog.objects.create(
+            user = user,
+            action = action,
+            object_type = obj.__class__.__name__,
+            object_id = obj.id
+        )
+    transaction.on_commit(_log)

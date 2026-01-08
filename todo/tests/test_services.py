@@ -35,8 +35,6 @@ class TodoServiceTest(TestCase):
 
     def test_delete_todo(self):
         todo = create_todo(user=self.user, title="Delete Todo")
-        delete_todo(todo=todo)
+        delete_todo(todo=todo, user=self.user)
         self.assertEqual(
-            todo.__class__.objects.count(),
-            0
-        )
+            todo.__class__.objects.count(), 0)

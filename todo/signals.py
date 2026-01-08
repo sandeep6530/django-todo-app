@@ -9,13 +9,15 @@ def todo_saved(sender, instance, created, **kwargs):
     AuditLog.objects.create(
         user = instance.user,
         action = "CREATED" if created else "UPDATED",
-        todo_title = instance.title
+        object_type = sender.__name__,
+        object_id = instance.id,
     )
 
 @receiver(post_delete, sender=Todo)
-def todo_saved(sender, instance, **kwargs):
+def todo_deleted(sender, instance, **kwargs):
     AuditLog.objects.create(
         user = instance.user,
         action = "DELETED",
-        todo_title = instance.title
+        object_type = sender.__name__,
+        object_id = instance.id
     )
