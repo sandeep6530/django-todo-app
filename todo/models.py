@@ -30,7 +30,7 @@ class Todo(models.Model):
         default="pending",
         db_index=True
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
@@ -44,6 +44,9 @@ class Todo(models.Model):
 
     objects = TodoManager()
     all_objects = TodoQuerySet.as_manager()
+
+    class Meta:
+        ordering = ["-created_at"]
 
     def __str__(self):
         return self.title

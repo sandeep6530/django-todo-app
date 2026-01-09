@@ -3,6 +3,12 @@ from django.contrib.auth import views as auth_views
 import debug_toolbar
 from django.urls import path, include
 
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+    SpectacularRedocView
+)
+
 
 
 urlpatterns = [
@@ -11,5 +17,9 @@ urlpatterns = [
     path("login/", auth_views.LoginView.as_view(template_name="auth/login.html"), name="login"),
     path("logout/", auth_views.LogoutView.as_view(next_page="login"), name="logout"),
     path("__debug__", include(debug_toolbar.urls)),
-    path("api/", include("todo.api.urls")),
+    
+    path("api/<str:version>/", include("todo.api.urls")),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema")),
+    # path("api/redoc/", SpectacularRedocView.as_view(url_name="schema")),
 ]

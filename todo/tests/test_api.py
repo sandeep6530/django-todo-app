@@ -20,7 +20,7 @@ class TodoAPITests(APITestCase):
         )
 
     def test_create_todo(self):
-        url = reverse("api-todo-list-create")
+        url = reverse("api-todo-list-create", kwargs={ "version": "v1" })
         data = {
             "title": "API Todo",
             "status": "pending"
@@ -35,8 +35,28 @@ class TodoAPITests(APITestCase):
     def test_list_todos(self):
         Todo.objects.create(user=self.user, title="Todo 1")
 
-        url = reverse("api-todo-list-create")
+        url = reverse("api-todo-list-create", kwargs={ "version": "v1" })
         response = self.client.get(url)
 
         # self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertIn("results", response.data)
+        self.assertEqual(len(response.data["results"]), 1)
+
+
+    def test_cursor_pagination_with_filter(self):
+        response = self.client.get("/api/v1/todos/?status=pending")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("next", response.data)
+        self.assertIn("results", response.data)
+
+
+    def test_login_throttle(self):
+        login_url = reverse("api-login", kwargs={"version": "v1"})
+
+        for _ in range(6):
+            response = self.client.post(
+                login_url, 
+                { "email": "auth@test.com", "password": "wrong" },
+                format = "json"
+            )
+        self.assertEqual(response.status_code, 429) 

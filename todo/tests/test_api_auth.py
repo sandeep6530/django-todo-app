@@ -16,7 +16,7 @@ class AuthAPITests(APITestCase):
         )
 
     def test_login_api(self):
-        url = reverse("api-login")
+        url = reverse("api-login", kwargs={"version": "v1"})
         data = {"email": "auth@test.com", "password": "pass123"}
 
         response = self.client.post(url, data, format="json")
@@ -27,7 +27,7 @@ class AuthAPITests(APITestCase):
 
 
     def test_logout_api(self):
-        login_url = reverse("api-login")
+        login_url = reverse("api-login", kwargs={ "version": "v1" })
         login_response = self.client.post(
             login_url,
             {"email": "auth@test.com", "password": "pass123"},
@@ -41,7 +41,7 @@ class AuthAPITests(APITestCase):
         
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
         
-        logout_url = reverse("api-logout")
+        logout_url = reverse("api-logout", kwargs={"version": "v1"})
         response = self.client.post(logout_url)
 
         self.assertEqual(response.status_code, 200)
@@ -61,7 +61,7 @@ class AuthAPITests(APITestCase):
         )
 
         login_response = self.client.post(
-            reverse("api-login"), 
+            reverse("api-login", kwargs={"version": "v1"}), 
             { "email": "auth@test.com", "password": "pass123"}, 
             format = "json"
         )
@@ -69,6 +69,9 @@ class AuthAPITests(APITestCase):
         token = login_response.data["token"]
         self.client.credentials(HTTP_AUTHRIZATION=f"Token {token}")
 
-        response = self.client.get(reverse("api-todo-detail", args=[other_user_todo.id]))
+        response = self.client.get(reverse("api-todo-detail", kwargs={
+            "version": "v1",
+            "pk": other_user_todo.id,
+        }))
 
         self.assertEqual(response.status_code, 401)
