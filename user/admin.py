@@ -4,7 +4,6 @@ from .models import User
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ("email", "username", "role", "is_active")
+    list_display = ("email", "username", "is_staff", "is_active")
+    list_filter = ("is_staff", "is_active")
     search_fields = ("email", "username")
-    readonly_fields = ("last_login", "date_joined")
-    list_filter = ("role", "is_active")

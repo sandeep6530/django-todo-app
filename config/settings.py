@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2+hj%^p35ybp#5)hi*wb_1x5_1vf(d)b2#ytixskzqf%^=@sr)'
+SECRET_KEY = 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -76,6 +76,10 @@ REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"].update({
     "login": "5/min",
     "logout": "10/min",
 })
+
+REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]["burst"] = "10/sec"
+
+REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]["admin"] = "500/min"
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Todo API",

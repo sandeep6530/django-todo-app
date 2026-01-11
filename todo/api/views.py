@@ -1,3 +1,6 @@
+from django.http import Http404
+
+from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, permissions, status
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -11,11 +14,13 @@ from drf_spectacular.utils import extend_schema
 
 from todo.selectors.todo_selectors import get_user_todos
 from todo.models import Todo
-from todo.policies import IsOwner
+from todo.permissions import IsAdminOrOwnerExceptDelete
 from todo.api.serializers import TodoSerializer, LoginSerializer
 from todo.mixins import OwnerQuerySetMixin
 from todo.api.pagination import TodoCursorPagination
 from todo.api.filters import TodoFilter
+from todo.throttles import BrustUserThrottle, LoginRateThrottle
+
 
 
 class TodoListCreateAPIView(generics.ListCreateAPIView):
@@ -30,27 +35,42 @@ class TodoListCreateAPIView(generics.ListCreateAPIView):
     filterset_class = TodoFilter
 
     def get_queryset(self):
-        if self.request.version == "v2":
-            return Todo.objects.filter(
-                user = self.request.user,
-                is_deleted = False,
-            ).select_related("user")
-        return Todo.objects.filter(user = self.request.user).order_by("-created_at")
+        if self.request.user.is_staff:
+            return Todo.objects.all().select_related("user")
+        return Todo.objects.filter(user = self.request.user).select_related("user").order_by("-created_at")
     
     def perform_create(self, serializer):
         serializer.save(user = self.request.user)
 
 
-class TodoDetailAPIView(OwnerQuerySetMixin, generics.RetrieveUpdateDestroyAPIView):
+class TodoDetailAPIView(generics.RetrieveDestroyAPIView):
+    queryset = Todo.objects.all()
     serializer_class = TodoSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwner]
+    permission_classes = [permissions.IsAuthenticated]
 
-    queryset = Todo.objects.all()   
-    
+    def get_object(self):
+        obj = super().get_object()
+        user = self.request.user
+
+        # READ protection
+        if not user.is_staff and obj.user != user:
+            raise PermissionDenied("You cannot access this todo")
+
+        return obj
+
+    def delete(self, request, *args, **kwargs):
+        user = request.user
+
+        # ONLY ADMINS CAN DELETE
+        if not user.is_staff:
+            raise PermissionDenied("Only admins can delete todos")
+
+        return super().delete(request, *args, **kwargs)
 
 
 class LoginAPIView(APIView):
     throttle_scope = "login"
+    throttle_classes = [LoginRateThrottle]
     permission_classes = [permissions.AllowAny]  
     serializer_class = LoginSerializer
 
@@ -90,6 +110,7 @@ class LoginAPIView(APIView):
             "token": token.key,
             "user_id": user.id,
         }, status=status.HTTP_200_OK)
+
 
 class LogoutAPIView(APIView):
     throttle_scope = "logout"
