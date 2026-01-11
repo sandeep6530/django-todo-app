@@ -2,7 +2,7 @@ from .base import *
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["yourdomain.com"]
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True

@@ -104,7 +104,8 @@ class LoginAPIView(APIView):
         serializer.is_valid(raise_exception=True)
 
         user = serializer.validated_data
-        token, _ = Token.objects.get_or_create(user=user)
+        Token.objects.filter(user=user).delete()
+        token = Token.objects.create(user=user)
 
         return Response({
             "token": token.key,
