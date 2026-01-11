@@ -22,7 +22,11 @@ from todo.api.filters import TodoFilter
 from todo.throttles import BrustUserThrottle, LoginRateThrottle
 
 
-
+@extend_schema(
+    tags=["Todos"],
+    summary="List & Create Todos",
+    description="List user todos or create a new todo",
+)
 class TodoListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = TodoSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -43,6 +47,11 @@ class TodoListCreateAPIView(generics.ListCreateAPIView):
         serializer.save(user = self.request.user)
 
 
+@extend_schema(
+    tags=["Todos"],
+    summary="Retrieve or Delete Todo",
+    description="Retrieve or delete a todo item",
+)
 class TodoDetailAPIView(generics.RetrieveDestroyAPIView):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
@@ -68,6 +77,11 @@ class TodoDetailAPIView(generics.RetrieveDestroyAPIView):
         return super().delete(request, *args, **kwargs)
 
 
+@extend_schema(
+    tags=["Auth"],
+    summary="User Login",
+    description="Login using email and password",
+)
 class LoginAPIView(APIView):
     throttle_scope = "login"
     throttle_classes = [LoginRateThrottle]
@@ -113,6 +127,11 @@ class LoginAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+@extend_schema(
+    tags=["Auth"],
+    summary="User Login",
+    description="Login using email and password",
+)
 class LogoutAPIView(APIView):
     throttle_scope = "logout"
     permission_classes = [permissions.IsAuthenticated]

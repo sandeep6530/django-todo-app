@@ -14,9 +14,9 @@ class TodoAPITests(APITestCase):
             password="pass123"
         )
 
-        token, _ = Token.objects.get_or_create(user=self.user)
+        token = Token.objects.create(user=self.user)
         self.client.credentials(
-            HTTP_AUTHORIZATION = f"Token {token.key}"
+            HTTP_AUTHORIZATION=f"Token {token.key}"
         )
 
     def test_create_todo(self):

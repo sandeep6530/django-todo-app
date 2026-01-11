@@ -34,3 +34,19 @@
 - Pagination
 - Search & filters
 - Docker deployment
+
+
+## API Documentation
+
+Swagger UI:
+http://localhost:8000/api/docs/
+
+Authentication:
+POST /api/v1/login/
+POST /api/v1/logout/
+
+Todos:
+GET    /api/v1/todos/
+POST   /api/v1/todos/
+GET    /api/v1/todos/{id}/
+DELETE /api/v1/todos/{id}/

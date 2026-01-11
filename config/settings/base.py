@@ -109,4 +109,17 @@ REST_FRAMEWORK = {
         "burst": "20/min",
         "sustained": "100/day",
     },
+    "EXCEPTION_HANDLER": "config.exceptions.custom_exception_handler",
 }
+
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Todo API",
+    "DESCRIPTION": "Production-ready Todo REST API",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SCHEMA_PATH_PREFIX": "/api/v1",
+    "COMPONENT_SPLIT_REQUEST": True,
+}
+
